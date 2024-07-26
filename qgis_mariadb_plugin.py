@@ -1,5 +1,6 @@
 import os
 import mariadb
+import psycopg2
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
@@ -9,6 +10,35 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction, QDialog
 from .qgis_mariadb_plugin_dialog import QGISMariaDBPluginDialog
+
+
+
+def install_dependencies():
+    """
+    Installs necessary Python packages for the QGIS plugin.
+    """
+    # List of required packages
+    required_packages = [
+        'pandas',
+        'geopandas',
+        'mariadb', 
+        'psycopg2-binary'
+    ]
+
+    # Install each package
+    for package in required_packages:
+        try:
+            # Check if the package is already installed
+            subprocess.check_call([sys.executable, '-m', 'pip', 'show', package])
+            print(f"Package '{package}' is already installed.")
+        except subprocess.CalledProcessError:
+            # If not installed, attempt to install it
+            try:
+                print(f"Installing package '{package}'...")
+                subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
+                print(f"Package '{package}' installed successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to install package '{package}'. Error: {e}")
 
 
 class QGISMariaDBPlugin:
@@ -27,7 +57,7 @@ class QGISMariaDBPlugin:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        icon_path = "icon.png"  # Replace with your plugin icon path
+        icon_path = os.path.join(self.plugin_dir,"icon.png")  # Replace with your plugin icon path
         self.add_action(
             icon_path,
             text=self.tr("MariaDB to QGIS"),
