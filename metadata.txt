@@ -1,0 +1,9 @@
+[general]
+name=MariaDB to QGIS
+qgisMinimumVersion=3.0
+author=Rubiere Ramirez
+email=rubiere.ramirez@gmail.com
+version=1.0
+description=Fetches data from MariaDB and writes it to a Shapefile or GeoPackage and adds it to your map.
+category=Data Management
+icon=icon.png
