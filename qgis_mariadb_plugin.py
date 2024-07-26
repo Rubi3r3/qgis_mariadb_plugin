@@ -75,10 +75,15 @@ class QGISMariaDBPlugin:
         user = self.dlg.lineEditUser.text()
         password = self.dlg.lineEditPassword.text()
         database = self.dlg.lineEditDatabase.text()
-        query = self.dlg.plainTextEditQuery.toPlainText()
+        #query = self.dlg.plainTextEditQuery.toPlainText()
+        table = self.dlg.lineEditTable.text()
+        x = self.dlg.lineEditX.text()
+        y = self.dlg.lineEditY.text()
         output_dir = self.dlg.lineEditOutputDir.text()
         save_as_shapefile = self.dlg.checkBoxShapefile.isChecked()
         save_as_geopackage = self.dlg.checkBoxGeoPackage.isChecked()
+        
+        query = f"SELECT *, {x} as x, {y} as y FROM {table} WHERE {x} IS NOT NULL;"
 
         if not (host and user and password and database and query and output_dir):
             QMessageBox.warning(
@@ -87,6 +92,8 @@ class QGISMariaDBPlugin:
                 "Please fill in all fields and try again.",
             )
             return
+
+        
 
         db_config = {
             "host": host,

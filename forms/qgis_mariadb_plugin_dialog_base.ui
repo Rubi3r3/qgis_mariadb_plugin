@@ -14,6 +14,7 @@
    <string>MariaDB to QGIS</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -43,12 +44,15 @@
       <item row="2" column="0">
        <widget class="QLabel" name="labelPassword">
         <property name="text">
-         <string>Password:</string>
+            <string>Password:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QLineEdit" name="lineEditPassword"/>
+       <property name="echoMode">
+            <enum>QLineEdit::Password</enum>
+      </property>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="labelDatabase">
@@ -63,18 +67,48 @@
      </layout>
     </widget>
    </item>
+
    <item>
-    <widget class="QGroupBox" name="groupBoxQuery">
-     <property name="title">
-      <string>SQL Query</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayoutQuery">
-      <item>
-       <widget class="QPlainTextEdit" name="plainTextEditQuery"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Table Query</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelTable">
+            <property name="text">
+             <string>Table:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEditTable"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelX">
+            <property name="text">
+             <string>Longitude (x):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEditX"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="labelY">
+            <property name="text">
+             <string>Latitude (y):</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEditY"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+
+
    <item>
     <widget class="QGroupBox" name="groupBoxOutput">
      <property name="title">
@@ -115,6 +149,7 @@
      </layout>
     </widget>
    </item>
+
    <item>
     <widget class="QPushButton" name="buttonFetchData">
      <property name="text">
