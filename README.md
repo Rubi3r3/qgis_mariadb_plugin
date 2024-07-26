@@ -1,5 +1,5 @@
 <h1>QGIS MariaDB Plugin</h1>
-# No Module called mariadb
+If No Module called mariadb <br>
 Open QGIS Python console (under Plugins » Python Console) and type:
 
 
