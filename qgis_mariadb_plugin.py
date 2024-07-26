@@ -10,36 +10,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction, QDialog
 from .qgis_mariadb_plugin_dialog import QGISMariaDBPluginDialog
-
-
-
-def install_dependencies():
-    """
-    Installs necessary Python packages for the QGIS plugin.
-    """
-    # List of required packages
-    required_packages = [
-        'pandas',
-        'geopandas',
-        'mariadb', 
-        'psycopg2-binary'
-    ]
-
-    # Install each package
-    for package in required_packages:
-        try:
-            # Check if the package is already installed
-            subprocess.check_call([sys.executable, '-m', 'pip', 'show', package])
-            print(f"Package '{package}' is already installed.")
-        except subprocess.CalledProcessError:
-            # If not installed, attempt to install it
-            try:
-                print(f"Installing package '{package}'...")
-                subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
-                print(f"Package '{package}' installed successfully.")
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to install package '{package}'. Error: {e}")
-
+from .install_dependencies import install_dependencies
 
 class QGISMariaDBPlugin:
     def __init__(self, iface):
@@ -71,6 +42,9 @@ class QGISMariaDBPlugin:
             self.iface.removePluginMenu(self.tr("&MariaDB to QGIS"), action)
             self.iface.removeToolBarIcon(action)
         del self.toolbar
+
+    def run(self):
+        install_dependencies()
 
     def add_action(
         self, icon_path, text, callback, parent=None, add_to_toolbar=True
