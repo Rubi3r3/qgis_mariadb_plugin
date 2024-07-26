@@ -97,8 +97,6 @@ class QGISMariaDBPlugin:
             )
             return
 
-        
-
         db_config = {
             "host": host,
             "user": user,
