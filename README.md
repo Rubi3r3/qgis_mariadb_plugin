@@ -1,5 +1,5 @@
 <h1>QGIS MariaDB Plugin</h1>
-
+This plugin allows users to connect to a MariaDB database, select spatial data, and export it as Shapefiles or GeoPackages. It simplifies the workflow of transferring data from MariaDB into QGIS for further analysis and visualization. With support for various data formats, users can easily integrate their database information into their QGIS projects.
 
 <b> Solution to initial install Error for no python models in QGIS. Specifically for mariadb.</b> <br> <br>
 <p><i>Example "No Module called mariadb" </i> </p>
