@@ -1,4 +1,6 @@
 <h1>QGIS MariaDB Plugin</h1>
+
+
 <b> Solution to initial install Error for no python models in QGIS. Specifically for mariadb.</b> <br> <br>
 <p><i>Example "No Module called mariadb" </i> </p>
 
