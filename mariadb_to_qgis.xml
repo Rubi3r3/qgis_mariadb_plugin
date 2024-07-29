@@ -1,5 +1,5 @@
 <plugins>
-        <pyqgis_plugin name="mariadb to qgis" version="1.0.1">
+        <pyqgis_plugin name="mariadb to qgis" version="1.0.0">
         <description>Plugin to enable additional features and capabilities of Giswater working together with QGIS and PostgreSQL</description>
         <about>Fetches data from MariaDB and writes it to a Shapefile or GeoPackage and adds it to your map.</about>
         <qgis_minimum_version>3.34</qgis_minimum_version>
