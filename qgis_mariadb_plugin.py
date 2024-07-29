@@ -172,7 +172,7 @@ class QGISMariaDBPlugin:
     def write_geopackage(self, gdf, output_geopackage_path, layer_name="points"):
         try:
             gdf.to_file(output_geopackage_path, layer=layer_name, driver="GPKG")
-            QMessageBox.information(self.dlg, "Success", f"GeoDataFrame successfully written to GeoPackage at {output_geopackage_path}")
+            QMessageBox.information(self.dlg, "Success", f"GeoData successfully written to GeoPackage at {output_geopackage_path}")
         except Exception as e:
             QMessageBox.critical(self.dlg, "GeoPackage Error", str(e))
 
