@@ -1,9 +1,9 @@
 <plugins>
-        <pyqgis_plugin name="mariadb to qgis" version="1.0.0">
+        <pyqgis_plugin name="MariaDB to QGIS version="1.0.0">
         <description>Fetches data from MariaDB and writes it to a Shapefile or GeoPackage and adds it to your map.</description>
         <about>This plugin allows users to connect to a MariaDB database, select spatial data, and export it as Shapefiles or GeoPackages. It simplifies the workflow of transferring data from MariaDB into QGIS for further analysis and visualization. With support for various data formats, users can easily integrate their database information into their QGIS projects.</about>
         <qgis_minimum_version>3.34</qgis_minimum_version>
-        <author_name>Rubiere Ramirez, Belmopan City, Belize</author_name>
+        <author_name>Rubiere Ramirez, Belmopan City, Belize </author_name>
         <download_url>https://rubi3r3.github.io/qgis_mariadb_plugin/mariadb_to_qgis.zip</download_url>
         <file_name>qgis_mariadb_plugin.zip</file_name>
         <icon>https://daniel-bartholomew.com/wp-content/uploads/2020/05/MariaDB-Seal-with-Text-alt.png</icon>
@@ -13,6 +13,6 @@
         <tracker></tracker>
         <dependencies>mariadb, mysql, geopandas</dependencies>
         <date>2024-07-26</date>
-        <experimental>True</experimental>
+        <experimental>False</experimental>
         </pyqgis_plugin>
         </plugins>
