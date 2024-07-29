@@ -3,6 +3,7 @@ import mariadb
 import psycopg2
 import pandas as pd
 import geopandas as gpd
+import datetime
 from shapely.geometry import Point
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from qgis.core import QgsProject, QgsVectorLayer
@@ -154,10 +155,14 @@ class QGISMariaDBPlugin:
             QMessageBox.warning(self.dlg, "Conversion Error", "DataFrame must contain 'x' and 'y' columns.")
             return None
 
+        user = self.dlg.lineEditUser.text()
+
         df["geometry"] = df.apply(lambda row: Point(row["x"], row["y"]), axis=1)
         gdf = gpd.GeoDataFrame(df, geometry="geometry")
         gdf.set_crs(epsg=4326, inplace=True)
         gdf = gdf.drop(columns=["x", "y"])
+        gdf["exported_by"] = user
+        gdf["exported_date"] = datetime.datetime.now().date()
         return gdf
 
     def write_shapefile(self, gdf, output_path):
