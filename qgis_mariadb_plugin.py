@@ -76,6 +76,7 @@ class QGISMariaDBPlugin:
 
     def on_fetch_data_clicked(self):
         host = self.dlg.lineEditHost.text()
+        port = int(self.dlg.lineEditPort.text())
         user = self.dlg.lineEditUser.text()
         password = self.dlg.lineEditPassword.text()
         database = self.dlg.lineEditDatabase.text()
@@ -99,6 +100,7 @@ class QGISMariaDBPlugin:
 
         db_config = {
             "host": host,
+            "port": port,
             "user": user,
             "password": password,
             "database": database,
@@ -124,6 +126,7 @@ class QGISMariaDBPlugin:
         try:
             connection = mariadb.connect(
                 host=config["host"],
+                port=config["port"],
                 user=config["user"],
                 password=config["password"],
                 database=config["database"],
@@ -154,6 +157,7 @@ class QGISMariaDBPlugin:
         df["geometry"] = df.apply(lambda row: Point(row["x"], row["y"]), axis=1)
         gdf = gpd.GeoDataFrame(df, geometry="geometry")
         gdf.set_crs(epsg=4326, inplace=True)
+        gdf = gdf.drop(columns=["x", "y"])
         return gdf
 
     def write_shapefile(self, gdf, output_path):
