@@ -4,7 +4,7 @@
         <about>Fetches data from MariaDB and writes it to a Shapefile or GeoPackage and adds it to your map.</about>
         <qgis_minimum_version>3.34</qgis_minimum_version>
         <author_name>Rubiere Ramirez, Belmopan City, Belize</author_name>
-        <download_url>https://github.com/Rubi3r3/qgis_mariadb_plugin/blob/master/qgis_mariadb_plugin.zip</download_url>
+        <download_url>https://rubi3r3.github.io/qgis_mariadb_plugin/mariadb_to_qgis.zip</download_url>
         <file_name>qgis_mariadb_plugin.zip</file_name>
         <icon></icon>
         <tags>gis, mariadb</tags>
