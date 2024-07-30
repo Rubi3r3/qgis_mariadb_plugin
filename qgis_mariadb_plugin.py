@@ -12,6 +12,7 @@ from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction, QDialog
 from .qgis_mariadb_plugin_dialog import QGISMariaDBPluginDialog
 from .install_dependencies import install_dependencies
+from urllib.parse import quote_plus
 
 class QGISMariaDBPlugin:
     def __init__(self, iface):
@@ -79,7 +80,7 @@ class QGISMariaDBPlugin:
         host = self.dlg.lineEditHost.text()
         port = int(self.dlg.lineEditPort.text())
         user = self.dlg.lineEditUser.text()
-        password = self.dlg.lineEditPassword.text()
+        password = quote_plus(self.dlg.lineEditPassword.text())
         database = self.dlg.lineEditDatabase.text()
         #query = self.dlg.plainTextEditQuery.toPlainText()
         table = self.dlg.lineEditTable.text()
