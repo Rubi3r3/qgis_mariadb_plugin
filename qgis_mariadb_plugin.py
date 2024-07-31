@@ -115,10 +115,10 @@ class QGISMariaDBPlugin:
 
             if gdf is not None:
                 if save_as_shapefile:
-                    self.write_shapefile(gdf, os.path.join(output_dir, "output.shp"))
+                    self.write_shapefile(gdf, os.path.join(output_dir, f"{table}.shp"))
 
                 if save_as_geopackage:
-                    self.write_geopackage(gdf, os.path.join(output_dir, "output.gpkg"))
+                    self.write_geopackage(gdf, os.path.join(output_dir, f"{table}.gpkg"))
 
                 # Load the data into QGIS
                 self.load_data_into_qgis(output_dir, save_as_shapefile, save_as_geopackage)
@@ -175,7 +175,10 @@ class QGISMariaDBPlugin:
         gdf.to_file(output_path, driver="ESRI Shapefile")
         QMessageBox.information(self.dlg, "Success", f"Shapefile written to {output_path}")
 
-    def write_geopackage(self, gdf, output_geopackage_path, layer_name="points"):
+    def write_geopackage(self, gdf, output_geopackage_path):
+        table = self.dlg.lineEditTable.text()
+        layer_name = f"{table}_points"
+
         try:
             gdf.to_file(output_geopackage_path, layer=layer_name, driver="GPKG")
             QMessageBox.information(self.dlg, "Success", f"GeoData successfully written to GeoPackage at {output_geopackage_path}")
@@ -183,17 +186,18 @@ class QGISMariaDBPlugin:
             QMessageBox.critical(self.dlg, "GeoPackage Error", str(e))
 
     def load_data_into_qgis(self, output_dir, save_as_shapefile, save_as_geopackage):
+        table = self.dlg.lineEditTable.text()
         if save_as_shapefile:
-            shapefile_path = os.path.join(output_dir, "output.shp")
-            layer = QgsVectorLayer(shapefile_path, "MariaDB Shapefile", "ogr")
+            shapefile_path = os.path.join(output_dir, f"{table}.shp")
+            layer = QgsVectorLayer(shapefile_path, f"{table} Geometry", "ogr")
             if not layer.isValid():
                 QMessageBox.critical(self.dlg, "Loading Error", "Failed to load shapefile into QGIS.")
             else:
                 QgsProject.instance().addMapLayer(layer)
 
         if save_as_geopackage:
-            geopackage_path = os.path.join(output_dir, "output.gpkg")
-            layer = QgsVectorLayer(f"{geopackage_path}|layername=points", "MariaDB GeoPackage", "ogr")
+            geopackage_path = os.path.join(output_dir, f"{table}.gpkg")
+            layer = QgsVectorLayer(f"{geopackage_path}|layername={table}_points", f"{table} Geometry", "ogr")
             if not layer.isValid():
                 QMessageBox.critical(self.dlg, "Loading Error", "Failed to load GeoPackage into QGIS.")
             else:
