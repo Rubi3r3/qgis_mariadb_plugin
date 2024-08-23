@@ -7,5 +7,5 @@ This plugin allows users to connect to a MariaDB database, select spatial data, 
 Open QGIS Python console (under Plugins » Python Console) and type:
 ```{python}
 import pip
-pip.main(['install', 'mariadb', 'mysql'])
+pip.main(['install', 'mariadb', 'mysql', 'sqlalchemy'])
 ```

@@ -4,6 +4,8 @@ import psycopg2
 import pandas as pd
 import geopandas as gpd
 import datetime
+import time
+from sqlalchemy import create_engine
 from shapely.geometry import Point
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from qgis.core import QgsProject, QgsVectorLayer
@@ -91,7 +93,8 @@ class QGISMariaDBPlugin:
         save_as_geopackage = self.dlg.checkBoxGeoPackage.isChecked()
         
         query = f"SELECT *, {x} as x, {y} as y FROM {table} WHERE {x} IS NOT NULL;"
-
+        query_null = f"SELECT *, {x} as x, {y} as y FROM {table} WHERE {x} IS NULL;"
+  
         if not (host and user and password and database and query and output_dir):
             QMessageBox.warning(
                 self.dlg,
@@ -109,6 +112,7 @@ class QGISMariaDBPlugin:
         }
 
         df = self.fetch_data_from_mariadb(db_config, query)
+        df_null = self.fetch_data_from_mariadb(db_config, query_null)
 
         if df is not None:
             gdf = self.convert_to_geodataframe(df)
@@ -116,9 +120,13 @@ class QGISMariaDBPlugin:
             if gdf is not None:
                 if save_as_shapefile:
                     self.write_shapefile(gdf, os.path.join(output_dir, f"{table}.shp"))
+                    if df_null is not None and not df_null.empty:
+                        self.write_csv(df_null, os.path.join(output_dir, f"{table}_null.csv"))
 
                 if save_as_geopackage:
                     self.write_geopackage(gdf, os.path.join(output_dir, f"{table}.gpkg"))
+                    if df_null is not None and not df_null.empty:
+                        self.write_null_to_geopackage(df_null, os.path.join(output_dir, f"{table}.gpkg"))
 
                 # Load the data into QGIS
                 self.load_data_into_qgis(output_dir, save_as_shapefile, save_as_geopackage)
@@ -166,14 +174,54 @@ class QGISMariaDBPlugin:
         gdf["exported_date"] = datetime.datetime.now().date()
         return gdf
 
+
+    def write_csv(self, df, output_path):
+        table = self.dlg.lineEditTable.text()
+
+        """Writes a DataFrame to a CSV file."""
+        df.to_csv(output_path, index=False)
+        QMessageBox.information(self.dlg, "Success", f"{table} with no geom written to {output_path}")
+
+    def write_null_to_geopackage(self, df_null, output_geopackage_path):
+        
+        table = self.dlg.lineEditTable.text()
+
+        """Writes DataFrame with null coordinates to a GeoPackage."""
+        if df_null is None or df_null.empty:
+            QMessageBox.warning(self.dlg, "GeoPackage Error", "No null data available to write.")
+            return
+
+        table_name = f"{table}_null_geom"
+
+        try:
+            # Create a SQLAlchemy engine for the GeoPackage
+            engine = create_engine(f"sqlite:///{output_geopackage_path}")
+        
+            # Write the DataFrame to the GeoPackage as a table
+            df_null.to_sql(table_name, engine, if_exists='replace', index=False)
+        
+            QMessageBox.information(self.dlg, "Success", f"{table} with no geometry successfully written to GeoPackage at {output_geopackage_path} as table '{table_name}'")
+        except Exception as e:
+            QMessageBox.critical(self.dlg, "GeoPackage Error", str(e))
+
     def write_shapefile(self, gdf, output_path):
         """Writes a GeoDataFrame to a shapefile."""
-        if gdf is None or gdf.empty:
-            QMessageBox.warning(self.dlg, "Shapefile Error", "No data available to write to shapefile.")
-            return
-        gdf.set_crs(epsg=4326, inplace=True)
-        gdf.to_file(output_path, driver="ESRI Shapefile")
-        QMessageBox.information(self.dlg, "Success", f"Shapefile written to {output_path}")
+        table = self.dlg.lineEditTable.text()
+
+        try: 
+            # Check if the shapefile exists and remove it
+            if os.path.exists(output_path):
+                os.remove(output_path)
+
+            if gdf is None or gdf.empty:
+                QMessageBox.warning(self.dlg, "Shapefile Error", "No data available to write to shapefile.")
+                return
+            gdf.set_crs(epsg=4326, inplace=True)
+            gdf.to_file(output_path, driver="ESRI Shapefile")
+            QMessageBox.information(self.dlg, "Success", f"{table} written to {output_path}")
+        finally:
+            time.sleep(1)
+  
 
     def write_geopackage(self, gdf, output_geopackage_path):
         table = self.dlg.lineEditTable.text()
@@ -181,19 +229,47 @@ class QGISMariaDBPlugin:
 
         try:
             gdf.to_file(output_geopackage_path, layer=layer_name, driver="GPKG")
-            QMessageBox.information(self.dlg, "Success", f"GeoData successfully written to GeoPackage at {output_geopackage_path}")
+            QMessageBox.information(self.dlg, "Success", f"{table} successfully written to GeoPackage at {output_geopackage_path}")
         except Exception as e:
             QMessageBox.critical(self.dlg, "GeoPackage Error", str(e))
 
     def load_data_into_qgis(self, output_dir, save_as_shapefile, save_as_geopackage):
         table = self.dlg.lineEditTable.text()
+
         if save_as_shapefile:
             shapefile_path = os.path.join(output_dir, f"{table}.shp")
-            layer = QgsVectorLayer(shapefile_path, f"{table} Geometry", "ogr")
-            if not layer.isValid():
-                QMessageBox.critical(self.dlg, "Loading Error", "Failed to load shapefile into QGIS.")
+            
+            # Check if the shapefile exists
+            if os.path.exists(shapefile_path):
+                # Define the layer name
+                layer_name = f"{table} Geometry"
+
+                # Remove existing layer with the same name if it exists
+                existing_layers = QgsProject.instance().mapLayersByName(layer_name)
+                for layer in existing_layers:
+                    QgsProject.instance().removeMapLayer(layer.id())
+
+                layer = QgsVectorLayer(shapefile_path, f"{table} Geometry", "ogr")
+                if not layer.isValid():
+                    QMessageBox.critical(self.dlg, "Loading Error", "Failed to load shapefile into QGIS.")
+                else:
+                    QgsProject.instance().addMapLayer(layer)
+        
+        # Load the CSV file as a table
+        csv_path = os.path.join(output_dir, f"{table}_null.csv")
+        if os.path.exists(csv_path):
+            
+            # Define the layer name
+            layer_name = f"{table} No Geometry"
+            existing_layers = QgsProject.instance().mapLayersByName(layer_name)
+            for layer in existing_layers:
+                QgsProject.instance().removeMapLayer(layer.id())
+
+            csv_layer = QgsVectorLayer(f"file:///{csv_path}?delimiter=,", f"{table} No Geometry", "delimitedtext")
+            if not csv_layer.isValid():
+                QMessageBox.critical(self.dlg, "Loading Error", f"Failed to load {table} No Geometry into QGIS.")
             else:
-                QgsProject.instance().addMapLayer(layer)
+                QgsProject.instance().addMapLayer(csv_layer)
 
         if save_as_geopackage:
             geopackage_path = os.path.join(output_dir, f"{table}.gpkg")
@@ -202,3 +278,10 @@ class QGISMariaDBPlugin:
                 QMessageBox.critical(self.dlg, "Loading Error", "Failed to load GeoPackage into QGIS.")
             else:
                 QgsProject.instance().addMapLayer(layer)
+            
+            # Load the {table}_null_geom table (without geometry)
+            null_layer = QgsVectorLayer(f"{geopackage_path}|layername={table}_null_geom", f"{table} No Geometry", "ogr")
+            if null_layer.isValid():
+                QgsProject.instance().addMapLayer(null_layer)
+            else:
+                QMessageBox.critical(self.dlg, "Loading Error", "Failed to load {table}_null_geom table into QGIS.")

@@ -11,7 +11,8 @@ def install_dependencies():
         'pandas',
         'geopandas',
         'mariadb', 
-        'psycopg2-binary'
+        'psycopg2-binary',
+        'sqlalchemy'
     ]
 
     # Install each package
