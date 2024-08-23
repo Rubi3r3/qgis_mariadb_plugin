@@ -1,5 +1,5 @@
 <plugins>
-        <pyqgis_plugin name="MariaDB to QGIS" version="1.0.3">
+        <pyqgis_plugin name="MariaDB to QGIS" version="1.0.2">
         <description>Fetches longitude (x) and latitude (y) data from MariaDB and writes it to a Shapefile or GeoPackage and adds it to your map.</description>
         <about>This plugin enables users to connect to a MariaDB, select a specific table, and identify the spatial data columns for longitude (x) and latitude (y). Users can then export the data as Shapefiles or GeoPackages. The plugin streamlines the process of transferring spatial data from a selected MariaDB table into QGIS for enhanced analysis and visualization. With support for multiple data formats, it facilitates seamless integration of database information into QGIS projects. Ensure you have the python mariadb module installed! On windows this can be installed using the OSGeo4W Shell. The plugin may give an error message if this is not installed.</about>
         <qgis_minimum_version>3.4</qgis_minimum_version>
