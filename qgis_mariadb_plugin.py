@@ -177,6 +177,12 @@ class QGISMariaDBPlugin:
 
     def write_csv(self, df, output_path):
         table = self.dlg.lineEditTable.text()
+        user = self.dlg.lineEditUser.text()
+
+        df = df.drop(columns=['x', 'y'])
+
+        df['exported_by'] = user
+        df['exported_date'] = datetime.datetime.now().date()
 
         """Writes a DataFrame to a CSV file."""
         df.to_csv(output_path, index=False)
@@ -185,6 +191,7 @@ class QGISMariaDBPlugin:
     def write_null_to_geopackage(self, df_null, output_geopackage_path):
         
         table = self.dlg.lineEditTable.text()
+        user = self.dlg.lineEditUser.text()
 
         """Writes DataFrame with null coordinates to a GeoPackage."""
         if df_null is None or df_null.empty:
@@ -194,6 +201,14 @@ class QGISMariaDBPlugin:
         table_name = f"{table}_null_geom"
 
         try:
+
+            # Drop the 'x' and 'y' columns if they exist
+            df_null = df_null.drop(columns=['x', 'y'], errors='ignore')
+
+            # Add 'exported_by' and 'exported_date' columns
+            df_null['exported_by'] = user  # Replace 'user' with actual username if needed
+            df_null['exported_date'] = datetime.datetime.now().date()
+
             # Create a SQLAlchemy engine for the GeoPackage
             engine = create_engine(f"sqlite:///{output_geopackage_path}")
         
